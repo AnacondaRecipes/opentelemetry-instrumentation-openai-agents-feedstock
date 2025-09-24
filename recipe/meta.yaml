@@ -1,40 +1,39 @@
 {% set name = "opentelemetry-instrumentation-openai-agents" %}
-{% set version = "0.47.3" %}
+{% set version = "0.47.2" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/opentelemetry_instrumentation_openai_agents-{{ version }}.tar.gz
-  sha256: 24fe9aa48e8fb85786677535a0159178e48d22f3bd1f6b8c0e687ec34eb2f27b
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_')}}-{{ version }}.tar.gz
+  sha256: ac0362cd4dc10901a9bd1ecb964b8739b7e2c88372fefd41e064e2fa4e37ec1d
 
 build:
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true  # [py<39]
 
 requirements:
   host:
-    - python {{ python_min }}
-    - poetry-core
     - pip
+    - python
+    - poetry-core
   run:
-    - python >={{ python_min }}
+    - python
     - opentelemetry-api >=1.28.0,<2.0.0
     - opentelemetry-instrumentation >=0.50b0
     - opentelemetry-semantic-conventions >=0.50b0
-    - opentelemetry-semantic-conventions-ai >=0.4.12,<0.5
+    - opentelemetry-semantic-conventions-ai >=0.4.13,<0.5
+  run_constrained:
+    - openai-agents >=0.2.7,<0.3.0
 
+# Unable to run tests and check imports, openai-agents is not in the main channel.
 test:
-  imports:
-    - opentelemetry.instrumentation.openai_agents
   commands:
     - pip check
   requires:
-    - openai-agents >=0.2.7,<1
     - pip
-    - python {{ python_min }}
 
 about:
   home: https://www.traceloop.com/openllmetry
@@ -42,8 +41,15 @@ about:
   doc_url: https://www.traceloop.com/docs/openllmetry/introduction
   summary: OpenTelemetry OpenAI instrumentation
   license: Apache-2.0
+  license_family: Apache
   license_file: LICENSE
+  description: |
+    This library enables tracing of agentic workflows implemented using the OpenAI Agents framework,
+    allowing visibility into agent reasoning, tool usage, and decision-making steps.
 
 extra:
   recipe-maintainers:
     - timkpaine
+  skip-lints:
+    - invalid_url
+    - missing_imports_or_run_test_py
