@@ -28,6 +28,8 @@ requirements:
 
 # Unable to run tests and check imports, openai-agents is not in the main channel.
 test:
+  imports:
+    - opentelemetry.instrumentation.openai_agents
   commands:
     - pip check
   requires:
